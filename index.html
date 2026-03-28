@@ -512,6 +512,115 @@ body::before {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+
+/* ══════════════════════════════════════ */
+/* ── RESPONSIVE — MOBILE ── */
+/* ══════════════════════════════════════ */
+@media (max-width: 768px) {
+  :root { --sidebar-w: 0px; }
+
+  /* Sidebar → bottom nav */
+  .sidebar {
+    width: 100%;
+    height: 56px;
+    flex-direction: row;
+    position: fixed;
+    top: auto; bottom: 0; left: 0; right: 0;
+    padding: 0 8px;
+    gap: 0;
+    justify-content: space-around;
+    z-index: 200;
+    border-right: none;
+    border-top: 1px solid var(--border2);
+  }
+  .sidebar-logo, .sidebar-spacer { display: none; }
+  .nav-item { width: 40px; height: 40px; border-radius: 10px; }
+  .nav-item svg { width: 18px; height: 18px; }
+
+  /* Main */
+  .main {
+    margin-left: 0;
+    padding: 16px 14px 72px 14px;
+  }
+
+  /* Header */
+  .header { flex-wrap: wrap; gap: 12px; }
+  .header-left h1 { font-size: 18px; }
+  .header-left p { font-size: 12px; }
+  .header-right { gap: 8px; }
+  .hbtn { padding: 6px 10px; font-size: 12px; }
+  .avatar { width: 34px; height: 34px; font-size: 11px; }
+
+  /* Tabs */
+  .tabs { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tab { padding: 7px 14px; font-size: 12px; }
+
+  /* Grids → single column */
+  .bns-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .grid-2, .grid-3, .grid-7-5, .grid-5-7 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* Big number cards */
+  .bn-card { padding: 14px 16px; border-radius: 14px; }
+  .bn-value { font-size: 22px; }
+  .bn-label { font-size: 10.5px; }
+  .bn-badge { font-size: 10px; }
+  .bn-sub { font-size: 10.5px; }
+
+  /* Cards */
+  .card { padding: 16px; border-radius: 14px; }
+  .card-title { font-size: 13px; }
+  .card-sub { font-size: 11px; }
+
+  /* Tables — horizontal scroll */
+  .data-table { display: block; overflow-x: auto; white-space: nowrap; }
+  .data-table th { font-size: 10px; padding: 0 6px 8px 0; }
+  .data-table td { font-size: 11.5px; padding: 7px 6px 7px 0; }
+
+  /* Progress bars */
+  .prog-top span:first-child { font-size: 11px; }
+  .prog-top span:last-child { font-size: 11px; }
+
+  /* Charts */
+  .chart-wrap { min-height: 180px; }
+
+  /* Fatura badges */
+  .fat-badge .fv { font-size: 15px; }
+  .fat-badge .fm { font-size: 10px; }
+  .fat-badge .fd { font-size: 9.5px; }
+
+  /* Alert cards */
+  .alert-card { padding: 12px; gap: 10px; }
+  .alert-icon { width: 28px; height: 28px; border-radius: 8px; }
+  .alert-icon svg { width: 14px; height: 14px; }
+  .alert-title { font-size: 12px; }
+  .alert-desc { font-size: 11px; }
+
+  /* Highlight card */
+  .highlight-card { padding: 16px; border-radius: 14px; }
+  .highlight-card .big { font-size: 26px; }
+  .highlight-card .sub { font-size: 11px; }
+
+  /* Economy rows */
+  .econ-left { font-size: 11.5px; }
+  .econ-val { font-size: 12px; }
+
+  /* Section labels */
+  .section-label { font-size: 10px; }
+
+  /* Legend */
+  .legend { gap: 6px; }
+  .legend-item { font-size: 10.5px; }
+}
+
+/* Extra small phones */
+@media (max-width: 400px) {
+  .bns-grid { grid-template-columns: 1fr; }
+  .header-right .hbtn:not(.primary) { display: none; }
+  .bn-value { font-size: 20px; }
+}
 </style>
 </head>
 <body>

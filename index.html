@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patrick — Dashboard Financeiro</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #eef2f9;
+  --bg2: #e4eaf5;
+  --surface: rgba(255,255,255,0.72);
+  --surface2: rgba(255,255,255,0.5);
+  --surface-solid: #ffffff;
+  --border: rgba(255,255,255,0.9);
+  --border2: rgba(180,196,230,0.4);
+  --blue: #3b82f6;
+  --blue-light: #60a5fa;
+  --blue-dark: #1d4ed8;
+  --blue-bg: #dbeafe;
+  --green: #10b981;
+  --green-bg: #d1fae5;
+  --green-dark: #065f46;
+  --red: #ef4444;
+  --red-bg: #fee2e2;
+  --red-dark: #991b1b;
+  --amber: #f59e0b;
+  --amber-bg: #fef3c7;
+  --amber-dark: #92400e;
+  --text: #0f172a;
+  --text2: #475569;
+  --text3: #94a3b8;
+  --sidebar-w: 72px;
+  --shadow: 0 2px 20px rgba(59,130,246,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 8px 32px rgba(59,130,246,0.12), 0 2px 8px rgba(0,0,0,0.06);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* Mesh background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(147,197,253,0.25) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 90%, rgba(196,181,253,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 60% 30%, rgba(167,243,208,0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--border2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  gap: 6px;
+}
+
+.sidebar-logo {
+  width: 40px; height: 40px;
+  background: var(--blue);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px;
+}
+.sidebar-logo svg { width: 22px; height: 22px; fill: white; }
+
+.nav-item {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all .2s;
+  color: var(--text3);
+  position: relative;
+}
+.nav-item:hover { background: var(--blue-bg); color: var(--blue); }
+.nav-item.active { background: var(--blue); color: white; box-shadow: 0 4px 12px rgba(59,130,246,0.35); }
+.nav-item svg { width: 20px; height: 20px; }
+
+.sidebar-spacer { flex: 1; }
+
+/* ── MAIN ── */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  padding: 24px 28px;
+  position: relative;
+  z-index: 1;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.header-left h1 { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -.3px; }
+.header-left p { font-size: 13px; color: var(--text2); margin-top: 2px; }
+.header-left p span { color: var(--red); font-weight: 600; }
+
+.header-right { display: flex; align-items: center; gap: 10px; }
+
+.hbtn {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  box-shadow: var(--shadow);
+  transition: all .2s;
+}
+.hbtn:hover { background: white; color: var(--text); }
+.hbtn svg { width: 16px; height: 16px; opacity: .6; }
+
+.hbtn.primary {
+  background: var(--blue);
+  color: white;
+  border-color: var(--blue);
+  box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+}
+.hbtn.primary:hover { background: var(--blue-dark); }
+.hbtn.primary svg { opacity: 1; }
+
+.avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: white;
+  border: 2px solid white;
+  box-shadow: var(--shadow);
+}
+
+/* ── TAB SWITCHER ── */
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface2);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 20px;
+  width: fit-content;
+  box-shadow: var(--shadow);
+}
+.tab {
+  padding: 7px 18px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.tab.active {
+  background: white;
+  color: var(--blue);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  transition: box-shadow .2s;
+}
+.card:hover { box-shadow: var(--shadow-lg); }
+
+/* ── BIG NUMBER CARDS ── */
+.bns-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.bn-card {
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+  transition: all .2s;
+}
+.bn-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+.bn-card::before {
+  content: '';
+  position: absolute;
+  top: -20px; right: -20px;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  opacity: .08;
+}
+.bn-card.ok::before { background: var(--green); }
+.bn-card.warn::before { background: var(--amber); }
+.bn-card.bad::before { background: var(--red); }
+.bn-card.info::before { background: var(--blue); }
+.bn-card.neutral::before { background: var(--text2); }
+
+.bn-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: 8px;
+}
+.bn-value {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -.5px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.bn-card.ok .bn-value { color: var(--green-dark); }
+.bn-card.warn .bn-value { color: var(--amber-dark); }
+.bn-card.bad .bn-value { color: var(--red-dark); }
+.bn-card.info .bn-value { color: var(--blue-dark); }
+.bn-card.neutral .bn-value { color: var(--text); }
+
+.bn-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.bn-badge.up { background: var(--green-bg); color: var(--green-dark); }
+.bn-badge.down { background: var(--red-bg); color: var(--red-dark); }
+.bn-badge.warn { background: var(--amber-bg); color: var(--amber-dark); }
+.bn-badge.neutral { background: var(--bg2); color: var(--text2); }
+
+.bn-sub {
+  font-size: 11.5px;
+  color: var(--text3);
+  margin-top: 5px;
+}
+
+/* ── GRID LAYOUTS ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+.grid-7-5 { display: grid; grid-template-columns: 7fr 5fr; gap: 14px; margin-bottom: 18px; }
+.grid-5-7 { display: grid; grid-template-columns: 5fr 7fr; gap: 14px; margin-bottom: 18px; }
+.mb18 { margin-bottom: 18px; }
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.card-sub {
+  font-size: 12px;
+  color: var(--text3);
+  margin-bottom: 16px;
+}
+
+/* ── PROGRESS BARS ── */
+.prog-row { margin-bottom: 11px; }
+.prog-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
+.prog-top span:first-child { font-size: 12px; color: var(--text2); font-weight: 500; }
+.prog-top span:last-child { font-size: 12px; font-weight: 700; color: var(--text); }
+.prog-bg { height: 7px; background: var(--bg2); border-radius: 10px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 10px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+
+/* ── TABLE ── */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: 0 8px 10px 0;
+  border-bottom: 1px solid var(--border2);
+  text-align: left;
+}
+.data-table th.r { text-align: right; }
+.data-table td {
+  font-size: 12.5px;
+  color: var(--text);
+  padding: 8px 8px 8px 0;
+  border-bottom: 1px solid rgba(226,232,240,0.5);
+  vertical-align: middle;
+}
+.data-table td.r { text-align: right; font-weight: 600; }
+.data-table td.m { color: var(--text3); }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr.tot td {
+  font-weight: 700;
+  font-size: 13px;
+  background: rgba(59,130,246,0.04);
+  padding-left: 8px;
+}
+.data-table tr.tot td:first-child { border-radius: 8px 0 0 8px; }
+.data-table tr.tot td:last-child { border-radius: 0 8px 8px 0; }
+
+.pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pill.fix { background: var(--blue-bg); color: var(--blue-dark); }
+.pill.cut { background: var(--red-bg); color: var(--red-dark); }
+.pill.ok { background: var(--green-bg); color: var(--green-dark); }
+.pill.warn { background: var(--amber-bg); color: var(--amber-dark); }
+.pill.neutral { background: var(--bg2); color: var(--text2); }
+
+/* ── ALERT CARDS ── */
+.alert-card {
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border: 1px solid transparent;
+}
+.alert-card.red { background: var(--red-bg); border-color: rgba(239,68,68,0.2); }
+.alert-card.amber { background: var(--amber-bg); border-color: rgba(245,158,11,0.2); }
+.alert-card.green { background: var(--green-bg); border-color: rgba(16,185,129,0.2); }
+
+.alert-icon {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.alert-card.red .alert-icon { background: var(--red); }
+.alert-card.amber .alert-icon { background: var(--amber); }
+.alert-card.green .alert-icon { background: var(--green); }
+.alert-icon svg { width: 16px; height: 16px; fill: white; }
+
+.alert-body { flex: 1; }
+.alert-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.alert-card.red .alert-title { color: var(--red-dark); }
+.alert-card.amber .alert-title { color: var(--amber-dark); }
+.alert-card.green .alert-title { color: var(--green-dark); }
+.alert-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+/* ── ECONOMY TABLE ── */
+.econ-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(226,232,240,0.5);
+}
+.econ-row:last-child { border-bottom: none; }
+.econ-left { font-size: 12.5px; color: var(--text); font-weight: 500; }
+.econ-val { font-size: 13px; font-weight: 700; }
+.econ-val.green { color: var(--green-dark); }
+.econ-val.amber { color: var(--amber-dark); }
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border2);
+}
+
+/* ── HIGHLIGHT CARD ── */
+.highlight-card {
+  background: linear-gradient(135deg, var(--blue) 0%, #6366f1 100%);
+  border-radius: 18px;
+  padding: 20px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(59,130,246,0.35);
+}
+.highlight-card::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+}
+.highlight-card::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; left: 40px;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+}
+.highlight-card h3 { font-size: 13px; font-weight: 600; opacity: .8; margin-bottom: 6px; }
+.highlight-card .big { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 4px; }
+.highlight-card .sub { font-size: 12px; opacity: .7; }
+.highlight-card .action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  margin-top: 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: all .2s;
+  backdrop-filter: blur(8px);
+}
+.highlight-card .action-btn:hover { background: rgba(255,255,255,0.3); }
+
+/* ── TABS CONTENT ── */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ── CHART WRAPPER ── */
+.chart-wrap { position: relative; width: 100%; }
+
+/* ── LEGEND ── */
+.legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--text2); }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+/* ── FATURA BADGE ── */
+.fat-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  flex-direction: column;
+  gap: 2px;
+}
+.fat-badge .fm { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; }
+.fat-badge .fv { font-size: 18px; font-weight: 800; letter-spacing: -.5px; }
+.fat-badge .fd { font-size: 10.5px; color: var(--text3); }
+.fat-badge.bad { background: var(--red-bg); }
+.fat-badge.bad .fv { color: var(--red-dark); }
+.fat-badge.warn { background: var(--amber-bg); }
+.fat-badge.warn .fv { color: var(--amber-dark); }
+.fat-badge.ok { background: var(--green-bg); }
+.fat-badge.ok .fv { color: var(--green-dark); }
+
+/* ── ANIMATE IN ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.main > * { animation: fadeUp .4s ease both; }
+.bns-grid .bn-card:nth-child(1) { animation-delay: .05s; }
+.bns-grid .bn-card:nth-child(2) { animation-delay: .1s; }
+.bns-grid .bn-card:nth-child(3) { animation-delay: .15s; }
+.bns-grid .bn-card:nth-child(4) { animation-delay: .2s; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+  </div>
+  <div class="nav-item active" title="Dashboard">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+  </div>
+  <div class="nav-item" title="Faturas">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+  </div>
+  <div class="nav-item" title="Assinaturas">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+  </div>
+  <div class="nav-item" title="Economia">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+  </div>
+  <div class="nav-item" title="Alertas">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+  </div>
+  <div class="sidebar-spacer"></div>
+  <div class="nav-item" title="Configurações">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <h1>Olá, Patrick 👋</h1>
+      <p>Você tem <span>3 alertas</span> financeiros para revisar</p>
+    </div>
+    <div class="header-right">
+      <button class="hbtn">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Março 2026
+      </button>
+      <button class="hbtn primary" onclick="window.print()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Exportar
+      </button>
+      <div class="avatar">PM</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('geral', this)">Visão Geral</div>
+    <div class="tab" onclick="switchTab('xp', this)">Cartão XP</div>
+    <div class="tab" onclick="switchTab('fixos', this)">Fixos</div>
+    <div class="tab" onclick="switchTab('alertas', this)">Alertas & Economia</div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- TAB: VISÃO GERAL -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="tab-content active" id="tab-geral">
+
+    <!-- BIG NUMBERS ROW 1 -->
+    <div class="bns-grid">
+      <div class="bn-card bad">
+        <div class="bn-label">Gasto total estimado/mês</div>
+        <div class="bn-value">R$ 17.100</div>
+        <div><span class="bn-badge down">⚠ Alto comprometimento</span></div>
+        <div class="bn-sub">fixos + XP + Itaú + outros</div>
+      </div>
+      <div class="bn-card bad">
+        <div class="bn-label">Comprometimento fixo</div>
+        <div class="bn-value">R$ 10.060</div>
+        <div><span class="bn-badge down">59% do total</span></div>
+        <div class="bn-sub">antes de qualquer variável</div>
+      </div>
+      <div class="bn-card warn">
+        <div class="bn-label">Cartão XP (média 4 meses)</div>
+        <div class="bn-value">R$ 7.968</div>
+        <div><span class="bn-badge warn">47% do gasto total</span></div>
+        <div class="bn-sub">jan–abr 2026</div>
+      </div>
+      <div class="bn-card ok">
+        <div class="bn-label">Economia potencial/mês</div>
+        <div class="bn-value">R$ 1.200+</div>
+        <div><span class="bn-badge up">↑ R$ 14.400/ano</span></div>
+        <div class="bn-sub">ações já identificadas</div>
+      </div>
+    </div>
+
+    <!-- BIG NUMBERS ROW 2 -->
+    <div class="bns-grid" style="margin-bottom:18px">
+      <div class="bn-card neutral">
+        <div class="bn-label">Aluguel</div>
+        <div class="bn-value">R$ 3.672</div>
+        <div><span class="bn-badge neutral">21% do total</span></div>
+        <div class="bn-sub">GMA Imobiliária</div>
+      </div>
+      <div class="bn-card neutral">
+        <div class="bn-label">Carro (parcela + seguro)</div>
+        <div class="bn-value">R$ 2.010</div>
+        <div><span class="bn-badge neutral">12% do total</span></div>
+        <div class="bn-sub">R$1.510 parcela + R$500 Tokio</div>
+      </div>
+      <div class="bn-card warn">
+        <div class="bn-label">Uber/99 — Camila</div>
+        <div class="bn-value">R$ 1.060</div>
+        <div><span class="bn-badge warn">~29 corridas/mês</span></div>
+        <div class="bn-sub">média 4 meses — maior variável</div>
+      </div>
+      <div class="bn-card ok">
+        <div class="bn-label">Fatura XP abr/26</div>
+        <div class="bn-value">R$ 6.595</div>
+        <div><span class="bn-badge up">↓ melhor mês</span></div>
+        <div class="bn-sub">queda de R$ 2.663 vs jan</div>
+      </div>
+    </div>
+
+    <div class="grid-7-5">
+      <!-- Distribuição do gasto total -->
+      <div class="card">
+        <div class="card-title">Onde vai cada real</div>
+        <div class="card-sub">Distribuição mensal estimada — média</div>
+        <div class="prog-row">
+          <div class="prog-top"><span>Aluguel</span><span>R$ 3.672 — 21%</span></div>
+          <div class="prog-bg"><div class="prog-fill" style="width:21%;background:#ef4444"></div></div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-top"><span>Cartão XP — compras & parcelas</span><span>R$ 2.800 — 16%</span></div>
+          <div class="prog-bg"><div class="prog-fill" style="width:16%;background:#64748b"></div></div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-top"><span>Carro (parcela + seguro + combustível)</span><span>R$ 2.230 — 13%</span></div>
+          <div class="prog-bg"><div class="prog-fill" style="width:13%;background:#3b82f6"></div></div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-top"><span>Lazer e viagens</span><span>R$ 1.500 — 9%</span></div>
+          <div class="prog-bg"><div class="prog-fill" style="width:9%;background:#10b981"></div></div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-top"><span>Uber/99 (Camila)</span><span>R$ 1.060 — 6%</span></div>
+          <div class="prog-bg"><div class="prog-fill" style="width:6%;background:#ef4444;opacity:.7"></div></div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-top"><span>Fixos XP (academia, natação, serviços)</span><span>R$ 1.000 — 6%</span></div>
+          <div class="prog-bg"><div class="prog-fill" style="width:6%;background:#8b5cf6"></div></div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-top"><span>Claro + Light</span><span>R$ 700 — 4%</span></div>
+          <div class="prog-bg"><div class="prog-fill" style="width:4%;background:#94a3b8"></div></div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-top"><span>Assinaturas digitais</span><span>R$ 570 — 3%</span></div>
+          <div class="prog-bg"><div class="prog-fill" style="width:3%;background:#f59e0b"></div></div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-top"><span>Alimentação / farmácia / pessoal</span><span>R$ 900 — 5%</span></div>
+          <div class="prog-bg"><div class="prog-fill" style="width:5%;background:#f59e0b;opacity:.7"></div></div>
+        </div>
+        <div class="prog-row" style="margin-bottom:0">
+          <div class="prog-top"><span>Outros não categorizados</span><span>R$ 2.668 — 16%</span></div>
+          <div class="prog-bg"><div class="prog-fill" style="width:16%;background:#64748b"></div></div>
+        </div>
+      </div>
+
+      <!-- Donut geral -->
+      <div class="card" style="display:flex;flex-direction:column">
+        <div class="card-title">Composição do gasto</div>
+        <div class="card-sub">Por categoria principal</div>
+        <div class="chart-wrap" style="height:200px;flex:1">
+          <canvas id="donutGeral"></canvas>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Moradia 21%</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Carro 13%</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Lazer 9%</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Assinaturas 3%</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div>Educação/saúde 4%</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#64748b"></div>Outros 50%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Evolução XP 4 meses -->
+    <div class="card mb18">
+      <div class="card-title">Evolução das faturas XP — jan a abr 2026</div>
+      <div class="card-sub">Empilhado por categoria de gasto</div>
+      <div class="chart-wrap" style="height:240px">
+        <canvas id="barEvolucao"></canvas>
+      </div>
+      <div class="legend" style="margin-top:14px">
+        <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Fixos recorrentes</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#854d0e"></div>Parcelas antigas</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Lazer/viagem</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Uber/família</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Alimentação/outros</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#64748b"></div>Outros</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- TAB: CARTÃO XP -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="tab-content" id="tab-xp">
+
+    <!-- 4 faturas -->
+    <div class="bns-grid" style="margin-bottom:18px">
+      <div class="fat-badge bad"><span class="fm">Jan/26</span><span class="fv">R$ 9.258</span><span class="fd">parcelas antigas puxaram</span></div>
+      <div class="fat-badge warn"><span class="fm">Fev/26</span><span class="fv">R$ 7.126</span><span class="fd">queda de R$ 2.100</span></div>
+      <div class="fat-badge warn"><span class="fm">Mar/26</span><span class="fv">R$ 8.891</span><span class="fd">viagens + R$ 2.275</span></div>
+      <div class="fat-badge ok"><span class="fm">Abr/26</span><span class="fv">R$ 6.595</span><span class="fd">melhor mês</span></div>
+    </div>
+
+    <div class="grid-5-7">
+      <!-- Donut XP -->
+      <div class="card">
+        <div class="card-title">Composição média XP</div>
+        <div class="card-sub">Média das 4 faturas por categoria</div>
+        <div class="chart-wrap" style="height:220px">
+          <canvas id="donutXP"></canvas>
+        </div>
+        <div class="legend" style="margin-top:10px">
+          <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Fixos R$1.430</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#854d0e"></div>Parcelas R$1.780</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Lazer R$1.200</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Uber/fam R$1.060</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Alimentação R$500</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#64748b"></div>Outros R$1.998</div>
+        </div>
+      </div>
+
+      <!-- Fixos no XP -->
+      <div class="card">
+        <div class="card-title">Fixos recorrentes no XP</div>
+        <div class="card-sub">Itens que aparecem toda fatura</div>
+        <table class="data-table">
+          <thead>
+            <tr><th>Item</th><th>Status</th><th class="r">Mensal</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Tokio Marine (seguro auto)</td><td><span class="pill warn">revisar</span></td><td class="r" style="color:#92400e">~R$ 537</td></tr>
+            <tr><td>Jambeiro Pneus (parcela)</td><td><span class="pill fix">fixo</span></td><td class="r">R$ 260</td></tr>
+            <tr><td>Rio Acqua (natação Léo)</td><td><span class="pill fix">fixo</span></td><td class="r">R$ 174</td></tr>
+            <tr><td>Smart Fit (Sua Academia)</td><td><span class="pill fix">fixo</span></td><td class="r">R$ 140</td></tr>
+            <tr><td>Apple serviços (iCloud etc.)</td><td><span class="pill fix">fixo</span></td><td class="r">~R$ 113</td></tr>
+            <tr><td>Curso Facilit (Camila)</td><td><span class="pill fix">fixo</span></td><td class="r">R$ 79</td></tr>
+            <tr><td>CapCut Pro</td><td><span class="pill fix">fixo</span></td><td class="r">R$ 66</td></tr>
+            <tr><td>Spotify</td><td><span class="pill fix">fixo</span></td><td class="r">R$ 41</td></tr>
+            <tr><td>Netflix</td><td><span class="pill fix">fixo</span></td><td class="r">R$ 21</td></tr>
+            <tr><td>Google One</td><td><span class="pill cut">cancelar</span></td><td class="r" style="color:#991b1b">R$ 97</td></tr>
+            <tr><td>Adobe Creative</td><td><span class="pill cut">verificar</span></td><td class="r" style="color:#991b1b">R$ 148?</td></tr>
+            <tr><td>ChatGPT (OpenAI)</td><td><span class="pill cut">verificar</span></td><td class="r" style="color:#991b1b">R$ 113?</td></tr>
+            <tr class="tot"><td>Total fixos XP</td><td></td><td class="r">~R$ 1.789</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Uber -->
+    <div class="card mb18">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px">
+        <div>
+          <div class="card-title">Uber/99 — Camila (cartão adicional)</div>
+          <div class="card-sub">Maior gasto variável identificado — meta sugerida: R$ 600/mês</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:22px;font-weight:800;color:#991b1b;letter-spacing:-.5px">R$ 1.060</div>
+          <div style="font-size:11px;color:var(--text3)">média mensal</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:180px">
+        <canvas id="barUber"></canvas>
+      </div>
+    </div>
+
+    <!-- Lazer/viagens destaque -->
+    <div class="card">
+      <div class="card-title">Lazer, viagens e alimentação — destaques</div>
+      <div class="card-sub">Gastos pontuais com maior impacto nas faturas</div>
+      <table class="data-table">
+        <thead><tr><th>Item</th><th>Categoria</th><th class="r">Mês</th><th class="r">Valor</th></tr></thead>
+        <tbody>
+          <tr><td>Windsor Marapendi Hotel</td><td><span class="pill ok">viagem</span></td><td class="r m">mar/26</td><td class="r">R$ 1.603</td></tr>
+          <tr><td>Booking.com Hotel</td><td><span class="pill ok">viagem</span></td><td class="r m">mar/26</td><td class="r">R$ 672</td></tr>
+          <tr><td>Venit Hoteis (1/2)</td><td><span class="pill ok">viagem</span></td><td class="r m">abr/26</td><td class="r">R$ 633</td></tr>
+          <tr><td>Pizzaria Delizie (2 pedidos)</td><td><span class="pill warn">alimentação</span></td><td class="r m">mar/26</td><td class="r">R$ 649</td></tr>
+          <tr><td>Boteco do Manolo (2x)</td><td><span class="pill warn">alimentação</span></td><td class="r m">abr/26</td><td class="r">R$ 735</td></tr>
+          <tr><td>Meep*Fazeningres (ingressos)</td><td><span class="pill ok">lazer</span></td><td class="r m">abr/26</td><td class="r">R$ 387</td></tr>
+          <tr><td>MP*Romas Viagens (encerrou)</td><td><span class="pill neutral">parcela paga</span></td><td class="r m">encerrou mar</td><td class="r" style="color:#065f46">R$ 0 agora</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- TAB: FIXOS -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="tab-content" id="tab-fixos">
+
+    <div class="grid-2">
+      <!-- Highlight card -->
+      <div class="highlight-card">
+        <h3>Comprometimento mensal fixo</h3>
+        <div class="big">R$ 10.060</div>
+        <div class="sub">Antes de qualquer compra variável, 59% do gasto estimado já está comprometido com despesas fixas.</div>
+        <button class="action-btn">Ver detalhamento ↗</button>
+      </div>
+
+      <!-- Resumo fixos fora do XP -->
+      <div class="card">
+        <div class="card-title">Fixos fora do cartão XP</div>
+        <div class="card-sub">Despesas mapeadas diretamente</div>
+        <table class="data-table">
+          <thead><tr><th>Item</th><th class="r">Valor/mês</th></tr></thead>
+          <tbody>
+            <tr><td>Aluguel (GMA Imobiliária)</td><td class="r">R$ 3.672</td></tr>
+            <tr><td>Carro — parcela financiamento</td><td class="r">R$ 1.510</td></tr>
+            <tr><td>Claro (telefone)</td><td class="r">R$ 240</td></tr>
+            <tr><td>Muay Thai</td><td class="r">R$ 190</td></tr>
+            <tr><td>Natação Léo (Rio Acqua)</td><td class="r">R$ 174</td></tr>
+            <tr><td>Light (energia elétrica)</td><td class="r">R$ 103</td></tr>
+            <tr><td>iCloud+ 2TB (Apple)</td><td class="r">R$ 67</td></tr>
+            <tr><td>CapCut Pro</td><td class="r">R$ 66</td></tr>
+            <tr><td>Gmail 100GB</td><td class="r">R$ 10</td></tr>
+            <tr class="tot"><td>Subtotal fora do XP</td><td class="r">R$ 6.032</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Fixos no XP -->
+    <div class="card mb18">
+      <div class="card-title">Fixos dentro do cartão XP</div>
+      <div class="card-sub">Cobranças recorrentes identificadas nas 4 faturas</div>
+      <div class="chart-wrap" style="height:180px;margin-bottom:16px">
+        <canvas id="barFixosXP"></canvas>
+      </div>
+      <table class="data-table">
+        <thead><tr><th style="width:35%">Item</th><th>Status</th><th class="r">Jan</th><th class="r">Fev</th><th class="r">Mar</th><th class="r">Abr</th><th class="r">Média</th></tr></thead>
+        <tbody>
+          <tr><td>Tokio Marine (seguro)</td><td><span class="pill warn">revisar</span></td><td class="r">599</td><td class="r">600</td><td class="r">475</td><td class="r">475</td><td class="r" style="color:#92400e">537</td></tr>
+          <tr><td>Jambeiro Pneus</td><td><span class="pill fix">fixo</span></td><td class="r">260</td><td class="r">260</td><td class="r">260</td><td class="r">260</td><td class="r">260</td></tr>
+          <tr><td>Smart Fit</td><td><span class="pill fix">fixo</span></td><td class="r">142</td><td class="r">140</td><td class="r">140</td><td class="r">140</td><td class="r">140</td></tr>
+          <tr><td>Rio Acqua (Léo)</td><td><span class="pill fix">fixo</span></td><td class="r">174</td><td class="r">174</td><td class="r m">—</td><td class="r">174</td><td class="r">174</td></tr>
+          <tr><td>Apple (iCloud/serviços)</td><td><span class="pill fix">fixo</span></td><td class="r">167</td><td class="r">77</td><td class="r">130</td><td class="r">77</td><td class="r">113</td></tr>
+          <tr><td>CapCut Pro</td><td><span class="pill fix">fixo</span></td><td class="r">66</td><td class="r">66</td><td class="r">66</td><td class="r">66</td><td class="r">66</td></tr>
+          <tr><td>Spotify</td><td><span class="pill fix">fixo</span></td><td class="r">41</td><td class="r">41</td><td class="r">41</td><td class="r">41</td><td class="r">41</td></tr>
+          <tr><td>Curso Facilit (Camila)</td><td><span class="pill fix">fixo</span></td><td class="r">79</td><td class="r">79</td><td class="r">79</td><td class="r">79</td><td class="r">79</td></tr>
+          <tr><td>Google One</td><td><span class="pill cut">cancelar</span></td><td class="r" style="color:#991b1b">48</td><td class="r" style="color:#991b1b">48</td><td class="r" style="color:#991b1b">97</td><td class="r" style="color:#991b1b">97</td><td class="r" style="color:#991b1b">97</td></tr>
+          <tr class="tot"><td>Total fixos no XP</td><td></td><td class="r">1.576</td><td class="r">1.485</td><td class="r">1.288</td><td class="r">1.409</td><td class="r">~R$ 1.440</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- TAB: ALERTAS & ECONOMIA -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="tab-content" id="tab-alertas">
+
+    <div class="grid-2">
+      <div>
+        <div class="section-label">Ação imediata</div>
+
+        <div class="alert-card red">
+          <div class="alert-icon">
+            <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01"/></svg>
+          </div>
+          <div class="alert-body">
+            <div class="alert-title">Uber/99 da Camila: R$ 1.060/mês em média</div>
+            <div class="alert-desc">São ~29 corridas por mês. Em fev e abr chegou a R$ 1.250+. Definir um limite mensal de R$ 600 pode economizar R$ 400-600/mês — o maior corte disponível.</div>
+          </div>
+        </div>
+
+        <div class="alert-card red">
+          <div class="alert-icon">
+            <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01"/></svg>
+          </div>
+          <div class="alert-body">
+            <div class="alert-title">Google One ainda cobrado em mar e abr (R$ 97)</div>
+            <div class="alert-desc">Você cancelou, mas a cobrança continuou nas 2 últimas faturas. Acesse sua conta Google e confirme que o cancelamento foi efetivado.</div>
+          </div>
+        </div>
+
+        <div class="alert-card red">
+          <div class="alert-icon">
+            <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01"/></svg>
+          </div>
+          <div class="alert-body">
+            <div class="alert-title">Adobe (R$ 148) e ChatGPT (R$ 113) — some após jan</div>
+            <div class="alert-desc">Aparecem apenas em jan/26. Foram cancelados ou mudaram de cartão? Confirme o status — se ainda ativos, são R$ 261/mês que podem estar saindo por outro canal.</div>
+          </div>
+        </div>
+
+        <div class="section-label" style="margin-top:18px">Revisar</div>
+
+        <div class="alert-card amber">
+          <div class="alert-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          </div>
+          <div class="alert-body">
+            <div class="alert-title">Seguro Tokio Marine: ~R$ 537/mês = R$ 6.444/ano</div>
+            <div class="alert-desc">Valor alto para seguro auto. Uma cotação em 2-3 seguradoras pode gerar economia de R$ 100-200/mês sem reduzir cobertura.</div>
+          </div>
+        </div>
+
+        <div class="alert-card amber">
+          <div class="alert-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          </div>
+          <div class="alert-body">
+            <div class="alert-title">Lazer e viagens: R$ 1.200/mês em média no XP</div>
+            <div class="alert-desc">Em março foram R$ 2.275 só em hotel. Gasto legítimo — mas planejar com antecedência (cashback, pontos) pode reduzir impacto na fatura em R$ 200-400/mês.</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Boas notícias</div>
+
+        <div class="alert-card green">
+          <div class="alert-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14M22 4L12 14.01l-3-3"/></svg>
+          </div>
+          <div class="alert-body">
+            <div class="alert-title">Fatura abril foi a melhor: R$ 6.595</div>
+            <div class="alert-desc">Queda de R$ 2.663 vs janeiro. Com o fim das parcelas antigas e sem viagem, esse é o seu "piso real" de gasto no XP.</div>
+          </div>
+        </div>
+
+        <div class="alert-card green">
+          <div class="alert-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14M22 4L12 14.01l-3-3"/></svg>
+          </div>
+          <div class="alert-body">
+            <div class="alert-title">Fatura paga integralmente todos os meses</div>
+            <div class="alert-desc">Saldo financiado zerado em todas as 4 faturas. Isso evita juros rotativos de 11,99% ao mês — essencial para saúde financeira.</div>
+          </div>
+        </div>
+
+        <div class="alert-card green">
+          <div class="alert-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14M22 4L12 14.01l-3-3"/></svg>
+          </div>
+          <div class="alert-body">
+            <div class="alert-title">Google One cancelado: +R$ 97/mês</div>
+            <div class="alert-desc">R$ 1.164/ano economizados. Só confirmar que parou de cobrar nas próximas faturas.</div>
+          </div>
+        </div>
+
+        <div class="section-label" style="margin-top:18px">Potencial de economia</div>
+
+        <div class="card">
+          <div class="card-title">Resumo das ações</div>
+          <div class="card-sub">Impacto financeiro estimado</div>
+          <div class="econ-row">
+            <div class="econ-left">Limite Uber Camila (cortar ~R$460)</div>
+            <div class="econ-val green">+R$ 400-600/mês</div>
+          </div>
+          <div class="econ-row">
+            <div class="econ-left">Google One (confirmação)</div>
+            <div class="econ-val green">+R$ 97/mês</div>
+          </div>
+          <div class="econ-row">
+            <div class="econ-left">Cotar seguro do carro</div>
+            <div class="econ-val amber">+R$ 100-200/mês</div>
+          </div>
+          <div class="econ-row">
+            <div class="econ-left">Adobe (se não usar)</div>
+            <div class="econ-val amber">+R$ 148/mês</div>
+          </div>
+          <div class="econ-row">
+            <div class="econ-left">ChatGPT (se não usar)</div>
+            <div class="econ-val amber">+R$ 113/mês</div>
+          </div>
+          <div class="econ-row">
+            <div class="econ-left">Planejamento antecipado de viagens</div>
+            <div class="econ-val amber">+R$ 200-400/mês</div>
+          </div>
+          <div class="econ-row" style="border-top:1.5px solid var(--border2);padding-top:12px;margin-top:4px">
+            <div class="econ-left" style="font-weight:700;font-size:13px">Total potencial</div>
+            <div class="econ-val green" style="font-size:15px">R$ 1.058-1.558/mês</div>
+          </div>
+          <div style="text-align:right;font-size:11px;color:var(--text3);margin-top:4px">= até R$ 18.696/ano</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+/* ── CHART DEFAULTS ── */
+Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#94a3b8';
+
+function makeChart(id, config) {
+  const ctx = document.getElementById(id);
+  if (ctx) new Chart(ctx, config);
+}
+
+const gc = 'rgba(226,232,240,0.5)';
+
+/* Donut geral */
+makeChart('donutGeral', {
+  type: 'doughnut',
+  data: {
+    labels: ['Moradia','Carro','Lazer','Assinaturas','Saúde/educação','Outros'],
+    datasets: [{
+      data: [21,13,9,3,4,50],
+      backgroundColor: ['#ef4444','#3b82f6','#10b981','#f59e0b','#8b5cf6','#64748b'],
+      borderWidth: 0, hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, cutout: '65%',
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.label + ': ' + ctx.parsed + '%' } }
+    }
+  }
+});
+
+/* Bar evolução */
+makeChart('barEvolucao', {
+  type: 'bar',
+  data: {
+    labels: ['Jan/26','Fev/26','Mar/26','Abr/26'],
+    datasets: [
+      { label: 'Fixos recorrentes', data: [1837,1485,1309,1430], backgroundColor: '#3b82f6', borderRadius: 3 },
+      { label: 'Parcelas antigas', data: [3788,2390,2340,590], backgroundColor: '#854d0e', borderRadius: 3 },
+      { label: 'Lazer/viagem', data: [200,200,2300,1350], backgroundColor: '#10b981', borderRadius: 3 },
+      { label: 'Uber/família', data: [876,1269,839,1256], backgroundColor: '#ef4444', borderRadius: 3 },
+      { label: 'Alimentação/outros', data: [557,782,403,369], backgroundColor: '#f59e0b', borderRadius: 3 },
+      { label: 'Outros', data: [2000,1000,1700,1600], backgroundColor: '#64748b', borderRadius: 3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { stacked: true, grid: { display: false }, ticks: { color: '#94a3b8' } },
+      y: { stacked: true, grid: { color: gc }, ticks: { color: '#94a3b8', callback: v => 'R$' + (v/1000).toFixed(0) + 'k' } }
+    }
+  }
+});
+
+/* Donut XP */
+makeChart('donutXP', {
+  type: 'doughnut',
+  data: {
+    labels: ['Fixos','Parcelas antigas','Lazer/viagem','Uber/família','Alimentação','Outros'],
+    datasets: [{
+      data: [1430,1780,1200,1060,500,1998],
+      backgroundColor: ['#3b82f6','#854d0e','#10b981','#ef4444','#f59e0b','#64748b'],
+      borderWidth: 0, hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, cutout: '62%',
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.label + ': R$' + ctx.parsed.toLocaleString('pt-BR') } }
+    }
+  }
+});
+
+/* Bar Uber */
+makeChart('barUber', {
+  type: 'bar',
+  data: {
+    labels: ['Jan/26','Fev/26','Mar/26','Abr/26'],
+    datasets: [
+      {
+        label: 'Uber/99 Camila',
+        data: [876,1269,839,1256],
+        backgroundColor: ['#fca5a5','#ef4444','#fca5a5','#ef4444'],
+        borderRadius: 6
+      },
+      {
+        label: 'Meta sugerida (R$600)',
+        data: [600,600,600,600],
+        type: 'line',
+        borderColor: '#10b981',
+        borderWidth: 2,
+        borderDash: [6,4],
+        pointRadius: 0,
+        fill: false,
+        tension: 0
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
+      y: { min: 0, max: 1500, grid: { color: gc }, ticks: { color: '#94a3b8', callback: v => 'R$' + v } }
+    }
+  }
+});
+
+/* Bar fixos XP */
+makeChart('barFixosXP', {
+  type: 'bar',
+  data: {
+    labels: ['Tokio Marine','Jambeiro Pneus','Smart Fit','Rio Acqua','Apple','Google One','CapCut','Spotify','Facilit','Netflix'],
+    datasets: [{
+      data: [537,260,140,174,113,97,66,41,79,21],
+      backgroundColor: ['#f59e0b','#3b82f6','#3b82f6','#3b82f6','#3b82f6','#ef4444','#3b82f6','#3b82f6','#3b82f6','#3b82f6'],
+      borderRadius: 6
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: gc }, ticks: { color: '#94a3b8', callback: v => 'R$' + v } },
+      y: { grid: { display: false }, ticks: { color: '#475569', font: { size: 11 } } }
+    }
+  }
+});
+
+/* ── TAB SWITCH ── */
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+</script>
+</body>
+</html>

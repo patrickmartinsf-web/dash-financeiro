@@ -31,7 +31,7 @@
   --text: #0f172a;
   --text2: #475569;
   --text3: #94a3b8;
-  --sidebar-w: 72px;
+  --sidebar-w: 0px;
   --shadow: 0 2px 20px rgba(59,130,246,0.08), 0 1px 4px rgba(0,0,0,0.04);
   --shadow-lg: 0 8px 32px rgba(59,130,246,0.12), 0 2px 8px rgba(0,0,0,0.06);
 }
@@ -61,19 +61,7 @@ body::before {
 
 /* ── SIDEBAR ── */
 .sidebar {
-  width: var(--sidebar-w);
-  background: rgba(255,255,255,0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-right: 1px solid var(--border2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 0;
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-  z-index: 100;
-  gap: 6px;
+  display: none;
 }
 
 .sidebar-logo {
@@ -517,30 +505,9 @@ body::before {
 /* ── RESPONSIVE — MOBILE ── */
 /* ══════════════════════════════════════ */
 @media (max-width: 768px) {
-  :root { --sidebar-w: 0px; }
-
-  /* Sidebar → bottom nav */
-  .sidebar {
-    width: 100%;
-    height: 56px;
-    flex-direction: row;
-    position: fixed;
-    top: auto; bottom: 0; left: 0; right: 0;
-    padding: 0 8px;
-    gap: 0;
-    justify-content: space-around;
-    z-index: 200;
-    border-right: none;
-    border-top: 1px solid var(--border2);
-  }
-  .sidebar-logo, .sidebar-spacer { display: none; }
-  .nav-item { width: 40px; height: 40px; border-radius: 10px; }
-  .nav-item svg { width: 18px; height: 18px; }
-
   /* Main */
   .main {
-    margin-left: 0;
-    padding: 16px 14px 72px 14px;
+    padding: 16px 14px 24px 14px;
   }
 
   /* Header */
@@ -615,6 +582,29 @@ body::before {
   .legend-item { font-size: 10.5px; }
 }
 
+/* ── MONTH SELECT ── */
+.month-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 34px 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  box-shadow: var(--shadow);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: all .2s;
+}
+.month-select:hover { background: white; color: var(--text); }
+.month-select:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
+
 /* Extra small phones */
 @media (max-width: 400px) {
   .bns-grid { grid-template-columns: 1fr; }
@@ -661,10 +651,13 @@ body::before {
       <p>Você tem <span>3 alertas</span> financeiros para revisar</p>
     </div>
     <div class="header-right">
-      <button class="hbtn">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        Março 2026
-      </button>
+      <select class="month-select" id="monthFilter" onchange="updateMonth(this.value)">
+        <option value="todos">Todos (média)</option>
+        <option value="jan">Janeiro 2026</option>
+        <option value="fev">Fevereiro 2026</option>
+        <option value="mar" selected>Março 2026</option>
+        <option value="abr">Abril 2026</option>
+      </select>
       <button class="hbtn primary" onclick="window.print()">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
         Exportar
@@ -688,11 +681,11 @@ body::before {
 
     <!-- BIG NUMBERS ROW 1 -->
     <div class="bns-grid">
-      <div class="bn-card bad">
+      <div class="bn-card bad" id="m-gasto-card">
         <div class="bn-label">Gasto total estimado/mês</div>
-        <div class="bn-value">R$ 17.100</div>
-        <div><span class="bn-badge down">⚠ Alto comprometimento</span></div>
-        <div class="bn-sub">fixos + XP + Itaú + outros</div>
+        <div class="bn-value" id="m-gasto-val">R$ 17.100</div>
+        <div><span class="bn-badge down" id="m-gasto-badge">⚠ Alto comprometimento</span></div>
+        <div class="bn-sub" id="m-gasto-sub">fixos + XP + Itaú + outros</div>
       </div>
       <div class="bn-card bad">
         <div class="bn-label">Comprometimento fixo</div>
@@ -700,11 +693,11 @@ body::before {
         <div><span class="bn-badge down">59% do total</span></div>
         <div class="bn-sub">antes de qualquer variável</div>
       </div>
-      <div class="bn-card warn">
-        <div class="bn-label">Cartão XP (média 4 meses)</div>
-        <div class="bn-value">R$ 7.968</div>
-        <div><span class="bn-badge warn">47% do gasto total</span></div>
-        <div class="bn-sub">jan–abr 2026</div>
+      <div class="bn-card warn" id="m-xp-card">
+        <div class="bn-label" id="m-xp-label">Cartão XP (média 4 meses)</div>
+        <div class="bn-value" id="m-xp-val">R$ 7.968</div>
+        <div><span class="bn-badge warn" id="m-xp-badge">47% do gasto total</span></div>
+        <div class="bn-sub" id="m-xp-sub">jan–abr 2026</div>
       </div>
       <div class="bn-card ok">
         <div class="bn-label">Economia potencial/mês</div>
@@ -722,23 +715,23 @@ body::before {
         <div><span class="bn-badge neutral">21% do total</span></div>
         <div class="bn-sub">GMA Imobiliária</div>
       </div>
-      <div class="bn-card neutral">
+      <div class="bn-card neutral" id="m-carro-card">
         <div class="bn-label">Carro (parcela + seguro)</div>
-        <div class="bn-value">R$ 2.010</div>
-        <div><span class="bn-badge neutral">12% do total</span></div>
-        <div class="bn-sub">R$1.510 parcela + R$500 Tokio</div>
+        <div class="bn-value" id="m-carro-val">R$ 2.010</div>
+        <div><span class="bn-badge neutral" id="m-carro-badge">12% do total</span></div>
+        <div class="bn-sub" id="m-carro-sub">R$1.510 parcela + R$500 Tokio</div>
       </div>
-      <div class="bn-card warn">
+      <div class="bn-card warn" id="m-uber-card">
         <div class="bn-label">Uber/99 — Camila</div>
-        <div class="bn-value">R$ 1.060</div>
-        <div><span class="bn-badge warn">~29 corridas/mês</span></div>
-        <div class="bn-sub">média 4 meses — maior variável</div>
+        <div class="bn-value" id="m-uber-val">R$ 1.060</div>
+        <div><span class="bn-badge warn" id="m-uber-badge">~29 corridas/mês</span></div>
+        <div class="bn-sub" id="m-uber-sub">média 4 meses — maior variável</div>
       </div>
-      <div class="bn-card ok">
-        <div class="bn-label">Fatura XP abr/26</div>
-        <div class="bn-value">R$ 6.595</div>
-        <div><span class="bn-badge up">↓ melhor mês</span></div>
-        <div class="bn-sub">queda de R$ 2.663 vs jan</div>
+      <div class="bn-card ok" id="m-fatura-card">
+        <div class="bn-label" id="m-fatura-label">Fatura XP abr/26</div>
+        <div class="bn-value" id="m-fatura-val">R$ 6.595</div>
+        <div><span class="bn-badge up" id="m-fatura-badge">↓ melhor mês</span></div>
+        <div class="bn-sub" id="m-fatura-sub">queda de R$ 2.663 vs jan</div>
       </div>
     </div>
 
@@ -1128,10 +1121,110 @@ Chart.defaults.color = '#94a3b8';
 
 function makeChart(id, config) {
   const ctx = document.getElementById(id);
-  if (ctx) new Chart(ctx, config);
+  if (ctx) return new Chart(ctx, config);
+  return null;
 }
 
 const gc = 'rgba(226,232,240,0.5)';
+
+/* ══════════════════════════════════════ */
+/* ── DADOS POR MÊS ── */
+/* ══════════════════════════════════════ */
+const MD = {
+  todos: {
+    gasto:  { val:'17.100', css:'bad',  badge:'⚠ Alto comprometimento', bcss:'down', sub:'fixos + XP + Itaú + outros' },
+    xp:     { label:'Cartão XP (média 4 meses)', val:'7.968', css:'warn', badge:'47% do gasto total', bcss:'warn', sub:'jan–abr 2026' },
+    carro:  { val:'2.010', badge:'12% do total', sub:'R$1.510 parcela + R$500 Tokio' },
+    uber:   { val:'1.060', css:'warn', badge:'~29 corridas/mês', bcss:'warn', sub:'média 4 meses — maior variável' },
+    fatura: { label:'Fatura XP (média)', val:'7.968', css:'warn', badge:'média 4 faturas', bcss:'warn', sub:'jan–abr 2026' },
+    xpCat:  [1837,1485,1309,1430],
+    parcCat:[3788,2390,2340,590],
+    lazCat: [200,200,2300,1350],
+    ubCat:  [876,1269,839,1256],
+    aliCat: [557,782,403,369],
+    outCat: [2000,1000,1700,1600],
+  },
+  jan: {
+    gasto:  { val:'15.290', css:'bad',  badge:'⚠ Mês mais caro', bcss:'down', sub:'XP R$9.258 + fixos R$6.032' },
+    xp:     { label:'Cartão XP jan/26', val:'9.258', css:'bad', badge:'61% do gasto', bcss:'down', sub:'parcelas antigas puxaram' },
+    carro:  { val:'2.109', badge:'14% do total', sub:'R$1.510 parcela + R$599 Tokio' },
+    uber:   { val:'876', css:'ok', badge:'menor mês', bcss:'up', sub:'gasto mais baixo de Uber' },
+    fatura: { label:'Fatura XP jan/26', val:'9.258', css:'bad', badge:'⚠ pico do período', bcss:'down', sub:'parcelas antigas puxaram' },
+  },
+  fev: {
+    gasto:  { val:'13.158', css:'warn', badge:'queda vs janeiro', bcss:'warn', sub:'XP R$7.126 + fixos R$6.032' },
+    xp:     { label:'Cartão XP fev/26', val:'7.126', css:'warn', badge:'54% do gasto', bcss:'warn', sub:'queda de R$2.100 vs jan' },
+    carro:  { val:'2.110', badge:'16% do total', sub:'R$1.510 parcela + R$600 Tokio' },
+    uber:   { val:'1.269', css:'bad', badge:'~35 corridas', bcss:'down', sub:'segundo mês mais alto' },
+    fatura: { label:'Fatura XP fev/26', val:'7.126', css:'warn', badge:'↓ queda de R$2.100', bcss:'warn', sub:'queda vs janeiro' },
+  },
+  mar: {
+    gasto:  { val:'14.923', css:'bad',  badge:'⚠ viagens impactaram', bcss:'down', sub:'XP R$8.891 + fixos R$6.032' },
+    xp:     { label:'Cartão XP mar/26', val:'8.891', css:'bad', badge:'60% do gasto', bcss:'down', sub:'viagens + R$2.275' },
+    carro:  { val:'1.985', badge:'13% do total', sub:'R$1.510 parcela + R$475 Tokio' },
+    uber:   { val:'839', css:'ok', badge:'~23 corridas', bcss:'up', sub:'mês mais baixo de Uber' },
+    fatura: { label:'Fatura XP mar/26', val:'8.891', css:'warn', badge:'viagens puxaram', bcss:'warn', sub:'hotel Windsor + Booking' },
+  },
+  abr: {
+    gasto:  { val:'12.627', css:'ok',   badge:'↓ Melhor mês', bcss:'up', sub:'XP R$6.595 + fixos R$6.032' },
+    xp:     { label:'Cartão XP abr/26', val:'6.595', css:'ok', badge:'52% do gasto', bcss:'up', sub:'melhor mês do período' },
+    carro:  { val:'1.985', badge:'16% do total', sub:'R$1.510 parcela + R$475 Tokio' },
+    uber:   { val:'1.256', css:'bad', badge:'~34 corridas', bcss:'down', sub:'segundo mais alto' },
+    fatura: { label:'Fatura XP abr/26', val:'6.595', css:'ok', badge:'↓ melhor mês', bcss:'up', sub:'queda de R$2.663 vs jan' },
+  }
+};
+
+/* ── HELPERS ── */
+function setCard(prefix, data) {
+  const card = document.getElementById('m-'+prefix+'-card');
+  const val  = document.getElementById('m-'+prefix+'-val');
+  const badge= document.getElementById('m-'+prefix+'-badge');
+  const sub  = document.getElementById('m-'+prefix+'-sub');
+  const label= document.getElementById('m-'+prefix+'-label');
+
+  if (val)   val.textContent = 'R$ ' + data.val;
+  if (badge) { badge.textContent = data.badge; badge.className = 'bn-badge ' + (data.bcss || 'neutral'); }
+  if (sub)   sub.textContent = data.sub;
+  if (label) label.textContent = data.label;
+  if (card && data.css) {
+    card.className = card.className.replace(/\b(ok|warn|bad|info|neutral)\b/g, '').trim();
+    card.classList.add(data.css);
+  }
+}
+
+/* ── MONTH FILTER ── */
+function updateMonth(key) {
+  const d = MD[key];
+  if (!d) return;
+
+  setCard('gasto', d.gasto);
+  setCard('xp', d.xp);
+  setCard('carro', d.carro);
+  setCard('uber', d.uber);
+  setCard('fatura', d.fatura);
+
+  /* Highlight selected month bar in evolution chart */
+  if (chartEvolucao) {
+    const monthIdx = { jan:0, fev:1, mar:2, abr:3 };
+    const idx = monthIdx[key];
+    chartEvolucao.data.datasets.forEach(ds => {
+      if (key === 'todos') {
+        ds.borderColor = undefined;
+        ds.borderWidth = undefined;
+      }
+    });
+    chartEvolucao.update();
+  }
+}
+
+/* Call on load with default selection */
+document.addEventListener('DOMContentLoaded', function() {
+  updateMonth(document.getElementById('monthFilter').value);
+});
+
+/* ══════════════════════════════════════ */
+/* ── CHARTS ── */
+/* ══════════════════════════════════════ */
 
 /* Donut geral */
 makeChart('donutGeral', {
@@ -1154,7 +1247,7 @@ makeChart('donutGeral', {
 });
 
 /* Bar evolução */
-makeChart('barEvolucao', {
+var chartEvolucao = makeChart('barEvolucao', {
   type: 'bar',
   data: {
     labels: ['Jan/26','Fev/26','Mar/26','Abr/26'],

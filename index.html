@@ -523,7 +523,7 @@ body::before {
   .tab { padding: 7px 14px; font-size: 12px; }
 
   /* Grids → single column */
-  .bns-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .bns-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
   .grid-2, .grid-3, .grid-7-5, .grid-5-7 {
     grid-template-columns: 1fr;
     gap: 12px;
@@ -708,7 +708,7 @@ body::before {
     </div>
 
     <!-- BIG NUMBERS ROW 2 -->
-    <div class="bns-grid" style="margin-bottom:18px">
+    <div class="bns-grid" style="margin-bottom:18px;grid-template-columns:repeat(5,1fr)">
       <div class="bn-card neutral">
         <div class="bn-label">Aluguel</div>
         <div class="bn-value">R$ 3.672</div>
@@ -732,6 +732,12 @@ body::before {
         <div class="bn-value" id="m-fatura-val">R$ 6.595</div>
         <div><span class="bn-badge up" id="m-fatura-badge">↓ melhor mês</span></div>
         <div class="bn-sub" id="m-fatura-sub">queda de R$ 2.663 vs jan</div>
+      </div>
+      <div class="bn-card info" id="m-itau-card">
+        <div class="bn-label" id="m-itau-label">Itaú Uniclass (média)</div>
+        <div class="bn-value" id="m-itau-val">R$ 697</div>
+        <div><span class="bn-badge neutral" id="m-itau-badge">cartão final 2356</span></div>
+        <div class="bn-sub" id="m-itau-sub">jan–abr 2026</div>
       </div>
     </div>
 
@@ -776,9 +782,13 @@ body::before {
           <div class="prog-top"><span>Alimentação / farmácia / pessoal</span><span>R$ 900 — 5%</span></div>
           <div class="prog-bg"><div class="prog-fill" style="width:5%;background:#f59e0b;opacity:.7"></div></div>
         </div>
+        <div class="prog-row">
+          <div class="prog-top"><span>Itaú Uniclass</span><span>R$ 697 — 5%</span></div>
+          <div class="prog-bg"><div class="prog-fill" style="width:5%;background:#1d4ed8"></div></div>
+        </div>
         <div class="prog-row" style="margin-bottom:0">
-          <div class="prog-top"><span>Outros não categorizados</span><span>R$ 2.668 — 16%</span></div>
-          <div class="prog-bg"><div class="prog-fill" style="width:16%;background:#64748b"></div></div>
+          <div class="prog-top"><span>Outros não categorizados</span><span>R$ 1.971 — 13%</span></div>
+          <div class="prog-bg"><div class="prog-fill" style="width:13%;background:#64748b"></div></div>
         </div>
       </div>
 
@@ -814,6 +824,23 @@ body::before {
         <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Uber/família</div>
         <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Alimentação/outros</div>
         <div class="legend-item"><div class="legend-dot" style="background:#64748b"></div>Outros</div>
+      </div>
+    </div>
+
+    <!-- Evolução Itaú Uniclass -->
+    <div class="card mb18">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px">
+        <div>
+          <div class="card-title">Itaú Uniclass — Evolução mensal</div>
+          <div class="card-sub">Cartão final 2356 — jan a abr 2026</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:22px;font-weight:800;color:var(--blue-dark);letter-spacing:-.5px">R$ 697</div>
+          <div style="font-size:11px;color:var(--text3)">média mensal</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:180px">
+        <canvas id="barItau"></canvas>
       </div>
     </div>
 
@@ -1132,11 +1159,12 @@ const gc = 'rgba(226,232,240,0.5)';
 /* ══════════════════════════════════════ */
 const MD = {
   todos: {
-    gasto:  { val:'17.100', css:'bad',  badge:'⚠ Alto comprometimento', bcss:'down', sub:'fixos + XP + Itaú + outros' },
-    xp:     { label:'Cartão XP (média 4 meses)', val:'7.968', css:'warn', badge:'47% do gasto total', bcss:'warn', sub:'jan–abr 2026' },
-    carro:  { val:'2.010', badge:'12% do total', sub:'R$1.510 parcela + R$500 Tokio' },
+    gasto:  { val:'14.697', css:'bad',  badge:'⚠ Alto comprometimento', bcss:'down', sub:'fixos + XP + Itaú' },
+    xp:     { label:'Cartão XP (média 4 meses)', val:'7.968', css:'warn', badge:'54% do gasto total', bcss:'warn', sub:'jan–abr 2026' },
+    carro:  { val:'2.010', badge:'14% do total', sub:'R$1.510 parcela + R$500 Tokio' },
     uber:   { val:'1.060', css:'warn', badge:'~29 corridas/mês', bcss:'warn', sub:'média 4 meses — maior variável' },
     fatura: { label:'Fatura XP (média)', val:'7.968', css:'warn', badge:'média 4 faturas', bcss:'warn', sub:'jan–abr 2026' },
+    itau:   { label:'Itaú Uniclass (média)', val:'697', css:'info', badge:'cartão final 2356', bcss:'neutral', sub:'jan–abr 2026' },
     xpCat:  [1837,1485,1309,1430],
     parcCat:[3788,2390,2340,590],
     lazCat: [200,200,2300,1350],
@@ -1145,32 +1173,36 @@ const MD = {
     outCat: [2000,1000,1700,1600],
   },
   jan: {
-    gasto:  { val:'15.290', css:'bad',  badge:'⚠ Mês mais caro', bcss:'down', sub:'XP R$9.258 + fixos R$6.032' },
-    xp:     { label:'Cartão XP jan/26', val:'9.258', css:'bad', badge:'61% do gasto', bcss:'down', sub:'parcelas antigas puxaram' },
-    carro:  { val:'2.109', badge:'14% do total', sub:'R$1.510 parcela + R$599 Tokio' },
+    gasto:  { val:'16.067', css:'bad',  badge:'⚠ Mês mais caro', bcss:'down', sub:'XP R$9.258 + Itaú R$777 + fixos R$6.032' },
+    xp:     { label:'Cartão XP jan/26', val:'9.258', css:'bad', badge:'58% do gasto', bcss:'down', sub:'parcelas antigas puxaram' },
+    carro:  { val:'2.109', badge:'13% do total', sub:'R$1.510 parcela + R$599 Tokio' },
     uber:   { val:'876', css:'ok', badge:'menor mês', bcss:'up', sub:'gasto mais baixo de Uber' },
     fatura: { label:'Fatura XP jan/26', val:'9.258', css:'bad', badge:'⚠ pico do período', bcss:'down', sub:'parcelas antigas puxaram' },
+    itau:   { label:'Itaú Uniclass jan/26', val:'777', css:'warn', badge:'2º maior mês', bcss:'warn', sub:'venc. 01/01/2026' },
   },
   fev: {
-    gasto:  { val:'13.158', css:'warn', badge:'queda vs janeiro', bcss:'warn', sub:'XP R$7.126 + fixos R$6.032' },
-    xp:     { label:'Cartão XP fev/26', val:'7.126', css:'warn', badge:'54% do gasto', bcss:'warn', sub:'queda de R$2.100 vs jan' },
-    carro:  { val:'2.110', badge:'16% do total', sub:'R$1.510 parcela + R$600 Tokio' },
+    gasto:  { val:'13.680', css:'warn', badge:'queda vs janeiro', bcss:'warn', sub:'XP R$7.126 + Itaú R$522 + fixos R$6.032' },
+    xp:     { label:'Cartão XP fev/26', val:'7.126', css:'warn', badge:'52% do gasto', bcss:'warn', sub:'queda de R$2.100 vs jan' },
+    carro:  { val:'2.110', badge:'15% do total', sub:'R$1.510 parcela + R$600 Tokio' },
     uber:   { val:'1.269', css:'bad', badge:'~35 corridas', bcss:'down', sub:'segundo mês mais alto' },
     fatura: { label:'Fatura XP fev/26', val:'7.126', css:'warn', badge:'↓ queda de R$2.100', bcss:'warn', sub:'queda vs janeiro' },
+    itau:   { label:'Itaú Uniclass fev/26', val:'522', css:'ok', badge:'abaixo da média', bcss:'up', sub:'venc. 01/02/2026' },
   },
   mar: {
-    gasto:  { val:'14.923', css:'bad',  badge:'⚠ viagens impactaram', bcss:'down', sub:'XP R$8.891 + fixos R$6.032' },
-    xp:     { label:'Cartão XP mar/26', val:'8.891', css:'bad', badge:'60% do gasto', bcss:'down', sub:'viagens + R$2.275' },
+    gasto:  { val:'15.327', css:'bad',  badge:'⚠ viagens impactaram', bcss:'down', sub:'XP R$8.891 + Itaú R$404 + fixos R$6.032' },
+    xp:     { label:'Cartão XP mar/26', val:'8.891', css:'bad', badge:'58% do gasto', bcss:'down', sub:'viagens + R$2.275' },
     carro:  { val:'1.985', badge:'13% do total', sub:'R$1.510 parcela + R$475 Tokio' },
     uber:   { val:'839', css:'ok', badge:'~23 corridas', bcss:'up', sub:'mês mais baixo de Uber' },
     fatura: { label:'Fatura XP mar/26', val:'8.891', css:'warn', badge:'viagens puxaram', bcss:'warn', sub:'hotel Windsor + Booking' },
+    itau:   { label:'Itaú Uniclass mar/26', val:'404', css:'ok', badge:'↓ menor mês', bcss:'up', sub:'venc. 01/03/2026' },
   },
   abr: {
-    gasto:  { val:'12.627', css:'ok',   badge:'↓ Melhor mês', bcss:'up', sub:'XP R$6.595 + fixos R$6.032' },
-    xp:     { label:'Cartão XP abr/26', val:'6.595', css:'ok', badge:'52% do gasto', bcss:'up', sub:'melhor mês do período' },
-    carro:  { val:'1.985', badge:'16% do total', sub:'R$1.510 parcela + R$475 Tokio' },
+    gasto:  { val:'13.714', css:'warn', badge:'2º melhor mês', bcss:'warn', sub:'XP R$6.595 + Itaú R$1.087 + fixos R$6.032' },
+    xp:     { label:'Cartão XP abr/26', val:'6.595', css:'ok', badge:'48% do gasto', bcss:'up', sub:'melhor mês do período' },
+    carro:  { val:'1.985', badge:'14% do total', sub:'R$1.510 parcela + R$475 Tokio' },
     uber:   { val:'1.256', css:'bad', badge:'~34 corridas', bcss:'down', sub:'segundo mais alto' },
-    fatura: { label:'Fatura XP abr/26', val:'6.595', css:'ok', badge:'↓ melhor mês', bcss:'up', sub:'queda de R$2.663 vs jan' },
+    fatura: { label:'Fatura XP abr/26', val:'6.595', css:'ok', badge:'↓ melhor mês XP', bcss:'up', sub:'queda de R$2.663 vs jan' },
+    itau:   { label:'Itaú Uniclass abr/26', val:'1.087', css:'bad', badge:'⚠ pico do período', bcss:'down', sub:'venc. 01/04/2026' },
   }
 };
 
@@ -1202,6 +1234,7 @@ function updateMonth(key) {
   setCard('carro', d.carro);
   setCard('uber', d.uber);
   setCard('fatura', d.fatura);
+  setCard('itau', d.itau);
 
   /* Highlight selected month bar in evolution chart */
   if (chartEvolucao) {
@@ -1342,6 +1375,41 @@ makeChart('barFixosXP', {
     scales: {
       x: { grid: { color: gc }, ticks: { color: '#94a3b8', callback: v => 'R$' + v } },
       y: { grid: { display: false }, ticks: { color: '#475569', font: { size: 11 } } }
+    }
+  }
+});
+
+/* Bar Itaú Uniclass */
+makeChart('barItau', {
+  type: 'bar',
+  data: {
+    labels: ['Jan/26','Fev/26','Mar/26','Abr/26'],
+    datasets: [
+      {
+        label: 'Itaú Uniclass',
+        data: [777,522,404,1087],
+        backgroundColor: ['#60a5fa','#60a5fa','#93c5fd','#3b82f6'],
+        borderRadius: 6
+      },
+      {
+        label: 'Média (R$697)',
+        data: [697,697,697,697],
+        type: 'line',
+        borderColor: '#f59e0b',
+        borderWidth: 2,
+        borderDash: [6,4],
+        pointRadius: 0,
+        fill: false,
+        tension: 0
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
+      y: { min: 0, max: 1400, grid: { color: gc }, ticks: { color: '#94a3b8', callback: v => 'R$' + v } }
     }
   }
 });

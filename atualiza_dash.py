@@ -112,26 +112,31 @@ def pluggy_get_item(token, item_id):
 
 
 def listar_items(token):
-    """Busca as conexões bancárias pelos IDs definidos no .env."""
-    if not ITEM_IDS:
-        erro(
-            "Nenhum item configurado!\n\n"
-            "Adicione seus IDs de item no .env:\n"
-            "  PLUGGY_ITEM_IDS=<uuid-xp>,<uuid-itau>\n\n"
-            "Para obter os IDs:\n"
-            "  1. Acesse dashboard.pluggy.ai → sua aplicação → Demo\n"
-            "  2. Clique em 'Connect Account' e conecte XP e Itaú\n"
-            "  3. Os IDs aparecerão na lista 'Connected Items'"
-        )
+    """Busca as conexões bancárias. Usa IDs do .env ou lista todos disponíveis."""
+    if ITEM_IDS:
+        log(f"Buscando {len(ITEM_IDS)} item(s) configurado(s)...")
+        items = []
+        for item_id in ITEM_IDS:
+            item = pluggy_get_item(token, item_id)
+            nome = item.get("connector", {}).get("name", "?")
+            status = item.get("status", "?")
+            log(f"  📌 {nome} — status: {status} — id: {item['id']}")
+            items.append(item)
+        return items
 
-    log(f"Buscando {len(ITEM_IDS)} item(s) configurado(s)...")
-    items = []
-    for item_id in ITEM_IDS:
-        item = pluggy_get_item(token, item_id)
+    # Sem IDs configurados: buscar todos os items da conta
+    log("Nenhum PLUGGY_ITEM_IDS no .env — buscando todos os items...")
+    items = pluggy_get(token, "/items")
+    if not items:
+        erro(
+            "Nenhuma conexão encontrada na sua conta Pluggy.\n\n"
+            "Acesse dashboard.pluggy.ai → sua aplicação → Demo\n"
+            "e conecte suas contas (XP, Itaú, etc.)."
+        )
+    for item in items:
         nome = item.get("connector", {}).get("name", "?")
         status = item.get("status", "?")
         log(f"  📌 {nome} — status: {status} — id: {item['id']}")
-        items.append(item)
     return items
 
 

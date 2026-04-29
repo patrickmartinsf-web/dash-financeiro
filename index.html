@@ -1161,12 +1161,12 @@ const gc = 'rgba(226,232,240,0.5)';
 /* ══════════════════════════════════════ */
 const MD = {
   todos: {
-    gasto:  { val:'14.544', css:'bad',  badge:'⚠ Alto comprometimento', bcss:'down', sub:'fixos + XP + Itaú' },
+    gasto:  { val:'14.506', css:'bad',  badge:'⚠ Alto comprometimento', bcss:'down', sub:'fixos + XP + Itaú' },
     xp:     { label:'Cartão XP (média 5 meses)', val:'7.815', css:'warn', badge:'54% do gasto total', bcss:'warn', sub:'jan–mai 2026' },
     carro:  { val:'2.010', badge:'14% do total', sub:'R$1.510 parcela + R$500 Tokio' },
     uber:   { val:'1.060', css:'warn', badge:'~29 corridas/mês', bcss:'warn', sub:'média 5 meses — maior variável' },
     fatura: { label:'Fatura XP (média)', val:'7.815', css:'warn', badge:'média 5 faturas', bcss:'warn', sub:'jan–mai 2026' },
-    itau:   { label:'Itaú Uniclass (média)', val:'697', css:'info', badge:'cartão final 2356', bcss:'neutral', sub:'jan–mai 2026' },
+    itau:   { label:'Itaú Uniclass (média)', val:'659', css:'info', badge:'cartão final 2356', bcss:'neutral', sub:'jan–mai 2026' },
     xpCat:  [1837,1485,1309,1430,1430],
     parcCat:[3788,2390,2340,590,350],
     lazCat: [200,200,2300,1350,1400],
@@ -1207,12 +1207,12 @@ const MD = {
     itau:   { label:'Itaú Uniclass abr/26', val:'1.087', css:'bad', badge:'⚠ pico do período', bcss:'down', sub:'venc. 01/04/2026' },
   },
   mai: {
-    gasto:  { val:'13.935', css:'warn', badge:'↑ acima de abr', bcss:'warn', sub:'XP R$7.206 + Itaú R$697* + fixos R$6.032' },
+    gasto:  { val:'13.745', css:'warn', badge:'↑ acima de abr', bcss:'warn', sub:'XP R$7.206 + Itaú R$507 + fixos R$6.032' },
     xp:     { label:'Cartão XP mai/26', val:'7.206', css:'warn', badge:'52% do gasto', bcss:'warn', sub:'vencimento 05/05/2026' },
     carro:  { val:'1.985', badge:'14% do total', sub:'R$1.510 parcela + R$475 Tokio' },
-    uber:   { val:'1.256', css:'warn', badge:'~34 corridas', bcss:'warn', sub:'estimativa baseada em abr' },
+    uber:   { val:'1.060', css:'warn', badge:'~29 corridas', bcss:'warn', sub:'estimativa baseada em média' },
     fatura: { label:'Fatura XP mai/26', val:'7.206', css:'warn', badge:'↑ alta vs abr R$6.595', bcss:'down', sub:'vencimento 05/05/2026' },
-    itau:   { label:'Itaú Uniclass mai/26', val:'697', css:'info', badge:'valor estimado*', bcss:'neutral', sub:'verificar no app Itaú' },
+    itau:   { label:'Itaú Uniclass mai/26', val:'507', css:'ok', badge:'↓ abaixo da média', bcss:'up', sub:'venc. 01/05/2026' },
   }
 };
 
@@ -1397,13 +1397,13 @@ makeChart('barItau', {
     datasets: [
       {
         label: 'Itaú Uniclass',
-        data: [777,522,404,1087,697],
-        backgroundColor: ['#60a5fa','#60a5fa','#93c5fd','#3b82f6','#60a5fa'],
+        data: [777,522,404,1087,507],
+        backgroundColor: ['#60a5fa','#60a5fa','#93c5fd','#3b82f6','#93c5fd'],
         borderRadius: 6
       },
       {
-        label: 'Média (R$697)',
-        data: [697,697,697,697,697],
+        label: 'Média (R$659)',
+        data: [659,659,659,659,659],
         type: 'line',
         borderColor: '#f59e0b',
         borderWidth: 2,

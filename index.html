@@ -655,8 +655,9 @@ body::before {
         <option value="todos">Todos (média)</option>
         <option value="jan">Janeiro 2026</option>
         <option value="fev">Fevereiro 2026</option>
-        <option value="mar" selected>Março 2026</option>
+        <option value="mar">Março 2026</option>
         <option value="abr">Abril 2026</option>
+        <option value="mai" selected>Maio 2026</option>
       </select>
       <button class="hbtn primary" onclick="window.print()">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
@@ -812,7 +813,7 @@ body::before {
 
     <!-- Evolução XP 4 meses -->
     <div class="card mb18">
-      <div class="card-title">Evolução das faturas XP — jan a abr 2026</div>
+      <div class="card-title">Evolução das faturas XP — jan a mai 2026</div>
       <div class="card-sub">Empilhado por categoria de gasto</div>
       <div class="chart-wrap" style="height:240px">
         <canvas id="barEvolucao"></canvas>
@@ -832,7 +833,7 @@ body::before {
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px">
         <div>
           <div class="card-title">Itaú Uniclass — Evolução mensal</div>
-          <div class="card-sub">Cartão final 2356 — jan a abr 2026</div>
+          <div class="card-sub">Cartão final 2356 — jan a mai 2026</div>
         </div>
         <div style="text-align:right">
           <div style="font-size:22px;font-weight:800;color:var(--blue-dark);letter-spacing:-.5px">R$ 697</div>
@@ -857,13 +858,14 @@ body::before {
       <div class="fat-badge warn"><span class="fm">Fev/26</span><span class="fv">R$ 7.126</span><span class="fd">queda de R$ 2.100</span></div>
       <div class="fat-badge warn"><span class="fm">Mar/26</span><span class="fv">R$ 8.891</span><span class="fd">viagens + R$ 2.275</span></div>
       <div class="fat-badge ok"><span class="fm">Abr/26</span><span class="fv">R$ 6.595</span><span class="fd">melhor mês</span></div>
+      <div class="fat-badge warn"><span class="fm">Mai/26</span><span class="fv">R$ 7.206</span><span class="fd">↑ alta vs abr</span></div>
     </div>
 
     <div class="grid-5-7">
       <!-- Donut XP -->
       <div class="card">
         <div class="card-title">Composição média XP</div>
-        <div class="card-sub">Média das 4 faturas por categoria</div>
+        <div class="card-sub">Média das 5 faturas por categoria</div>
         <div class="chart-wrap" style="height:220px">
           <canvas id="donutXP"></canvas>
         </div>
@@ -1159,18 +1161,18 @@ const gc = 'rgba(226,232,240,0.5)';
 /* ══════════════════════════════════════ */
 const MD = {
   todos: {
-    gasto:  { val:'14.697', css:'bad',  badge:'⚠ Alto comprometimento', bcss:'down', sub:'fixos + XP + Itaú' },
-    xp:     { label:'Cartão XP (média 4 meses)', val:'7.968', css:'warn', badge:'54% do gasto total', bcss:'warn', sub:'jan–abr 2026' },
+    gasto:  { val:'14.544', css:'bad',  badge:'⚠ Alto comprometimento', bcss:'down', sub:'fixos + XP + Itaú' },
+    xp:     { label:'Cartão XP (média 5 meses)', val:'7.815', css:'warn', badge:'54% do gasto total', bcss:'warn', sub:'jan–mai 2026' },
     carro:  { val:'2.010', badge:'14% do total', sub:'R$1.510 parcela + R$500 Tokio' },
-    uber:   { val:'1.060', css:'warn', badge:'~29 corridas/mês', bcss:'warn', sub:'média 4 meses — maior variável' },
-    fatura: { label:'Fatura XP (média)', val:'7.968', css:'warn', badge:'média 4 faturas', bcss:'warn', sub:'jan–abr 2026' },
-    itau:   { label:'Itaú Uniclass (média)', val:'697', css:'info', badge:'cartão final 2356', bcss:'neutral', sub:'jan–abr 2026' },
-    xpCat:  [1837,1485,1309,1430],
-    parcCat:[3788,2390,2340,590],
-    lazCat: [200,200,2300,1350],
-    ubCat:  [876,1269,839,1256],
-    aliCat: [557,782,403,369],
-    outCat: [2000,1000,1700,1600],
+    uber:   { val:'1.060', css:'warn', badge:'~29 corridas/mês', bcss:'warn', sub:'média 5 meses — maior variável' },
+    fatura: { label:'Fatura XP (média)', val:'7.815', css:'warn', badge:'média 5 faturas', bcss:'warn', sub:'jan–mai 2026' },
+    itau:   { label:'Itaú Uniclass (média)', val:'697', css:'info', badge:'cartão final 2356', bcss:'neutral', sub:'jan–mai 2026' },
+    xpCat:  [1837,1485,1309,1430,1430],
+    parcCat:[3788,2390,2340,590,350],
+    lazCat: [200,200,2300,1350,1400],
+    ubCat:  [876,1269,839,1256,1256],
+    aliCat: [557,782,403,369,500],
+    outCat: [2000,1000,1700,1600,2270],
   },
   jan: {
     gasto:  { val:'16.067', css:'bad',  badge:'⚠ Mês mais caro', bcss:'down', sub:'XP R$9.258 + Itaú R$777 + fixos R$6.032' },
@@ -1203,6 +1205,14 @@ const MD = {
     uber:   { val:'1.256', css:'bad', badge:'~34 corridas', bcss:'down', sub:'segundo mais alto' },
     fatura: { label:'Fatura XP abr/26', val:'6.595', css:'ok', badge:'↓ melhor mês XP', bcss:'up', sub:'queda de R$2.663 vs jan' },
     itau:   { label:'Itaú Uniclass abr/26', val:'1.087', css:'bad', badge:'⚠ pico do período', bcss:'down', sub:'venc. 01/04/2026' },
+  },
+  mai: {
+    gasto:  { val:'13.935', css:'warn', badge:'↑ acima de abr', bcss:'warn', sub:'XP R$7.206 + Itaú R$697* + fixos R$6.032' },
+    xp:     { label:'Cartão XP mai/26', val:'7.206', css:'warn', badge:'52% do gasto', bcss:'warn', sub:'vencimento 05/05/2026' },
+    carro:  { val:'1.985', badge:'14% do total', sub:'R$1.510 parcela + R$475 Tokio' },
+    uber:   { val:'1.256', css:'warn', badge:'~34 corridas', bcss:'warn', sub:'estimativa baseada em abr' },
+    fatura: { label:'Fatura XP mai/26', val:'7.206', css:'warn', badge:'↑ alta vs abr R$6.595', bcss:'down', sub:'vencimento 05/05/2026' },
+    itau:   { label:'Itaú Uniclass mai/26', val:'697', css:'info', badge:'valor estimado*', bcss:'neutral', sub:'verificar no app Itaú' },
   }
 };
 
@@ -1238,7 +1248,7 @@ function updateMonth(key) {
 
   /* Highlight selected month bar in evolution chart */
   if (chartEvolucao) {
-    const monthIdx = { jan:0, fev:1, mar:2, abr:3 };
+    const monthIdx = { jan:0, fev:1, mar:2, abr:3, mai:4 };
     const idx = monthIdx[key];
     chartEvolucao.data.datasets.forEach(ds => {
       if (key === 'todos') {
@@ -1283,14 +1293,14 @@ makeChart('donutGeral', {
 var chartEvolucao = makeChart('barEvolucao', {
   type: 'bar',
   data: {
-    labels: ['Jan/26','Fev/26','Mar/26','Abr/26'],
+    labels: ['Jan/26','Fev/26','Mar/26','Abr/26','Mai/26'],
     datasets: [
-      { label: 'Fixos recorrentes', data: [1837,1485,1309,1430], backgroundColor: '#3b82f6', borderRadius: 3 },
-      { label: 'Parcelas antigas', data: [3788,2390,2340,590], backgroundColor: '#854d0e', borderRadius: 3 },
-      { label: 'Lazer/viagem', data: [200,200,2300,1350], backgroundColor: '#10b981', borderRadius: 3 },
-      { label: 'Uber/família', data: [876,1269,839,1256], backgroundColor: '#ef4444', borderRadius: 3 },
-      { label: 'Alimentação/outros', data: [557,782,403,369], backgroundColor: '#f59e0b', borderRadius: 3 },
-      { label: 'Outros', data: [2000,1000,1700,1600], backgroundColor: '#64748b', borderRadius: 3 }
+      { label: 'Fixos recorrentes', data: [1837,1485,1309,1430,1430], backgroundColor: '#3b82f6', borderRadius: 3 },
+      { label: 'Parcelas antigas', data: [3788,2390,2340,590,350], backgroundColor: '#854d0e', borderRadius: 3 },
+      { label: 'Lazer/viagem', data: [200,200,2300,1350,1400], backgroundColor: '#10b981', borderRadius: 3 },
+      { label: 'Uber/família', data: [876,1269,839,1256,1256], backgroundColor: '#ef4444', borderRadius: 3 },
+      { label: 'Alimentação/outros', data: [557,782,403,369,500], backgroundColor: '#f59e0b', borderRadius: 3 },
+      { label: 'Outros', data: [2000,1000,1700,1600,2270], backgroundColor: '#64748b', borderRadius: 3 }
     ]
   },
   options: {
@@ -1327,17 +1337,17 @@ makeChart('donutXP', {
 makeChart('barUber', {
   type: 'bar',
   data: {
-    labels: ['Jan/26','Fev/26','Mar/26','Abr/26'],
+    labels: ['Jan/26','Fev/26','Mar/26','Abr/26','Mai/26'],
     datasets: [
       {
         label: 'Uber/99 Camila',
-        data: [876,1269,839,1256],
-        backgroundColor: ['#fca5a5','#ef4444','#fca5a5','#ef4444'],
+        data: [876,1269,839,1256,1256],
+        backgroundColor: ['#fca5a5','#ef4444','#fca5a5','#ef4444','#fca5a5'],
         borderRadius: 6
       },
       {
         label: 'Meta sugerida (R$600)',
-        data: [600,600,600,600],
+        data: [600,600,600,600,600],
         type: 'line',
         borderColor: '#10b981',
         borderWidth: 2,
@@ -1383,17 +1393,17 @@ makeChart('barFixosXP', {
 makeChart('barItau', {
   type: 'bar',
   data: {
-    labels: ['Jan/26','Fev/26','Mar/26','Abr/26'],
+    labels: ['Jan/26','Fev/26','Mar/26','Abr/26','Mai/26'],
     datasets: [
       {
         label: 'Itaú Uniclass',
-        data: [777,522,404,1087],
-        backgroundColor: ['#60a5fa','#60a5fa','#93c5fd','#3b82f6'],
+        data: [777,522,404,1087,697],
+        backgroundColor: ['#60a5fa','#60a5fa','#93c5fd','#3b82f6','#60a5fa'],
         borderRadius: 6
       },
       {
         label: 'Média (R$697)',
-        data: [697,697,697,697],
+        data: [697,697,697,697,697],
         type: 'line',
         borderColor: '#f59e0b',
         borderWidth: 2,
